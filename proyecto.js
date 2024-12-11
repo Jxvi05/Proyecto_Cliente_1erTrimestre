@@ -44,7 +44,7 @@ class Persona extends Direccion {
   constructor(id, nombre, edad, direccion) {
     super(direccion.calle, direccion.numero, direccion.piso, direccion.codPostal, direccion.provincia, direccion.localidad);
     this.id = id;
-    this.nombre = nombre;
+    this.nombre = ((nombre.match(/^[a-zA-ZáéíóúüÁÉÍÓÚÜ ]+$/)) ? nombre : "persona");
     this.edad = edad;
   }
 
@@ -69,7 +69,8 @@ class Persona extends Direccion {
 La clase Estudiante contiene los atributos asignaturas,matriculas y hereda los atributos de la clase Persona al heredar de la misma.
 Tiene los siguientes métodos:
 
-matricular: matricula a los estudiantes en una asignatura asignandole una fecha de matriculación.
+matricular: matricula a los estudiantes en una asignatura asignandole una fecha de matriculación, esta última se valida,
+haciendo que este en fornato DD/MM/YYYY y que los dias, meses y años esten entre dos valores.
 
 desmatricular: desmatricula un estudiante de una asignatura.
 
@@ -100,6 +101,24 @@ class Estudiante extends Persona {
   }
 
   matricular(asignatura, fecha) {
+
+    const fechaRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+    const match = fecha.match(fechaRegex);
+  
+    if (!match) {
+      console.log("Fecha no válida. Debe estar en el formato DD/MM/YYYY.");
+      return;
+    }
+  
+    const dia = parseInt(match[1], 10);
+    const mes = parseInt(match[2], 10);
+    const anio = parseInt(match[3], 10);
+  
+    if (dia < 1 || dia > 30 || mes < 1 || mes > 12 || anio < 1 || anio > 2024) {
+      console.log("Fecha no válida. Verifica día, mes y/o año.");
+      return;
+    }
+
     if (!this.asignaturas[asignatura]) {
       this.asignaturas[asignatura] = [];
       this.matriculas[asignatura] = fecha;
@@ -315,16 +334,19 @@ function menu() {
   const sistema = new SistemaGestionAcademica();
 
   while (true) {
-    console.log("\n--- Sistema de Gestión Académica ---");
+    console.log("\n===== Sistema de Gestión Académica =====");
     console.log("1. Añadir estudiante");
     console.log("2. Eliminar estudiante");
     console.log("3. Listar estudiantes");
-    console.log("4. Matricular estudiante");
-    console.log("5. Desmatricular estudiante");
-    console.log("6. Añadir calificación");
-    console.log("7. Calcular promedio de asignatura");
-    console.log("8. Calcular promedio general");
-    console.log("9. Generar reporte general");
+    console.log("4. Listar estudiante por nombre");
+    console.log("5. Matricular estudiante");
+    console.log("6. Desmatricular estudiante");
+    console.log("7. Añadir calificación");
+    console.log("8. Buscar asignaturas por nombre");
+    console.log("9. Calcular promedio de asignatura de un estudiante");
+    console.log("10. Calcular promedio general de una asignatura");
+    console.log("11. Calcular promedio general");
+    console.log("12. Generar reporte general");
     console.log("0. Salir");
     let opcion = window.prompt("Selecciona una opción: ");
 
@@ -352,12 +374,30 @@ function menu() {
         break;
       }
 
-      case '3':
-        console.log("\n--- Lista de Estudiantes ---");
+      case '3':{
+        console.log("\n== Lista de Estudiantes ==");
         sistema.listarEstudiantes();
         break;
+      }
 
       case '4': {
+        const nombre = window.prompt("Introduce el nombre o parte del nombre del estudiante: ").toLowerCase();
+        const resultados = sistema.estudiantes.filter((estudiante) => 
+          estudiante.getNombre.toLowerCase().includes(nombre)
+        );
+
+        if (resultados.length > 0) {
+          console.log(`\n== Estudiantes encontrados con el nombre que contiene "${nombre}" ==`);
+          resultados.forEach((estudiante) => {
+            console.log(estudiante.mostrarEstudiante());
+          });
+        } else {
+          console.log(`No se encontraron estudiantes con el nombre que contiene "${nombre}".`);
+        }
+        break;
+      }
+
+      case '5': {
         const id = window.prompt("Introduce el ID del estudiante: ");
         const asignatura = window.prompt("Introduce el nombre de la asignatura: ");
         const fecha = window.prompt("Introduce la fecha de matriculación: ");
@@ -370,7 +410,7 @@ function menu() {
         break;
       }
 
-      case '5': {
+      case '6': {
         const id = window.prompt("Introduce el ID del estudiante: ");
         const asignatura = window.prompt("Introduce el nombre de la asignatura: ");
         const estudiante = sistema.estudiantes.find(estudiante => estudiante.id === id);
@@ -382,7 +422,7 @@ function menu() {
         break;
       }
 
-      case '6': {
+      case '7': {
         const id = window.prompt("Introduce el ID del estudiante: ");
         const asignatura = window.prompt("Introduce el nombre de la asignatura: ");
         const calificacion = parseFloat(window.prompt("Introduce la calificación: "));
@@ -395,7 +435,32 @@ function menu() {
         break;
       }
 
-      case '7': {
+      case '8': {
+        const patron = window.prompt("Introduce el patrón de texto para buscar asignaturas: ").toLowerCase();
+        let asignaturasEncontradas = [];
+
+        // Buscar asignaturas que coincidan parcialmente con el patrón
+        sistema.estudiantes.forEach((estudiante) => {
+          Object.keys(estudiante.getAsignaturas).forEach((asignatura) => {
+            if (asignatura.toLowerCase().includes(patron)) {
+              asignaturasEncontradas.push(asignatura);
+            }
+          });
+        });
+
+        // Mostrar las asignaturas encontradas
+        if (asignaturasEncontradas.length > 0) {
+          console.log(`\n== Asignaturas encontradas con el patrón "${patron}" ==`);
+          asignaturasEncontradas.forEach((asignatura) => {
+            console.log(asignatura);
+          });
+        } else {
+          console.log(`No se encontraron asignaturas con el patrón "${patron}".`);
+        }
+        break;
+      }
+
+      case '9': {
         const id = window.prompt("Introduce el ID del estudiante: ");
         const asignatura = window.prompt("Introduce el nombre de la asignatura: ");
         const estudiante = sistema.estudiantes.find(estudiante => estudiante.id === id);
@@ -408,7 +473,29 @@ function menu() {
         break;
       }
 
-      case '8': {
+      case '10': {
+        const asignatura = window.prompt("Introduce el nombre de la asignatura: ");
+        let totalCalificaciones = 0;
+        let cantidadCalificaciones = 0;
+
+        sistema.estudiantes.forEach((estudiante) => {
+          if (asignatura in estudiante.getAsignaturas) {
+            const calificaciones = estudiante.getAsignaturas[asignatura];
+            totalCalificaciones += calificaciones.reduce((total, nota) => total + nota, 0);
+            cantidadCalificaciones += calificaciones.length;
+          }
+        });
+
+        if (cantidadCalificaciones > 0) {
+          const promedio = (totalCalificaciones / cantidadCalificaciones).toFixed(2);
+          console.log(`Promedio general de la asignatura "${asignatura}": ${promedio}`);
+        } else {
+          console.log(`No hay calificaciones registradas para la asignatura "${asignatura}".`);
+        }
+        break;
+      }
+
+      case '11': {
         const id = window.prompt("Introduce el ID del estudiante: ");
         const estudiante = sistema.estudiantes.find(estudiante => estudiante.id === id);
         if (estudiante) {
@@ -420,7 +507,7 @@ function menu() {
         break;
       }
 
-      case '9':
+      case '12':
         console.log("\n--- Reporte General ---");
         sistema.generarReporte();
         break;
