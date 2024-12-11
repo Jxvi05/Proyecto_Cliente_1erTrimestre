@@ -362,7 +362,7 @@ function menu() {
     console.log("11. Calcular promedio general");
     console.log("12. Generar reporte general");
     console.log("0. Salir");
-    let opcion = window.prompt("Abre la consola\nSelecciona una opción: ");
+    let opcion = window.prompt("Abre la consola y selecciona una opción: ");
 
     switch (opcion) {
       case '1': {
