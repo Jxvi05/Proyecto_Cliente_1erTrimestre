@@ -18,7 +18,7 @@ class Direccion {
     this.calle = calle;
     this.numero = numero;
     this.piso = piso;
-    this.codPostal = (new String(codPostal.match(/^[0-9]{5}$/))) ? codPostal : "00000";
+    this.codPostal = /^[0-9]{5}$/.test(codPostal) ? codPostal : "00000";
     this.provincia = provincia;
     this.localidad = localidad;
   }
@@ -282,70 +282,68 @@ class SistemaGestionAcademica {
   }
 }
 
-console.log("\n\nEjemplos de funcionamiento\n\n");
+function cargarDatosDePrueba(sistemaPrueba) {
 
-const sistema = new SistemaGestionAcademica();
+  console.log("=========== Datos de prueba ===========");
+  
+  // Crear direcciones
+  const direccionEstudiante1 = new Direccion("Calle Arquitecto Felipe Gimenez Lacal", 7, "5º", "18014", "Granada", "Granada");
+  const direccionEstudiante2 = new Direccion("Barriada Andalucia", 3, "3º", "29770", "Malaga", "Torrox");
+  const direccionEstudiante3 = new Direccion("Calle pez", 14, "Bajo", "29763", "Malaga", "Torremolinos");
+  const direccionEstudiante4 = new Direccion("Calle Duarte", 58, "2º", "28001", "Madrid", "Madrid");
+  const direccionEstudiante5 = new Direccion("Los veiros", 21, "8º", "27298", "Lugo", "Bresh");
 
-const direccionEstudiante1 = new Direccion("Calle Arquitecto Felipe Gimenez Lacal", 7, "5º", "18014", "Granada", "Granada");
-const direccionEstudiante2 = new Direccion("Barriada Andalucia", 3, "3º", "29770", "Malaga", "Torrox");
-const direccionEstudiante3 = new Direccion("Calle pez", 14, "Bajo", "29763", "Malaga", "Torremolinos");
-const direccionEstudiante4 = new Direccion("Calle Duarte", 58, "2º", "28001", "Madrid", "Madrid");
-const direccionEstudiante5 = new Direccion("Los veiros", 21, "8º", "27298", "Lugo", "Bresh");
+  // Crear estudiantes
+  const estudiante1 = new Estudiante("53899109N", "Javier Escobar Vela", 19, direccionEstudiante1);
+  const estudiante2 = new Estudiante("53899110J", "Alejandro Escobar Vela", 17, direccionEstudiante2);
+  const estudiante3 = new Estudiante("77470749X", "Patricia Gonzalez Rico", 15, direccionEstudiante3);
+  const estudiante4 = new Estudiante("62502570F", "Jose Suarez Molina", 12, direccionEstudiante4);
+  const estudiante5 = new Estudiante("12053867k", "Estrella Diaz Fernandez", 16, direccionEstudiante5);
 
-const estudiante1 = new Estudiante("53899109N", "Javier Escobar Vela", 19, direccionEstudiante1);
-const estudiante2 = new Estudiante("53899110J", "Alejandro Escobar Vela", 17, direccionEstudiante2);
-const estudiante3 = new Estudiante("77470749X", "Patricia Gonzalez Rico", 15, direccionEstudiante3);
-const estudiante4 = new Estudiante("62502570F", "Jose Suarez Molina", 12, direccionEstudiante4);
-const estudiante5 = new Estudiante("12053867k", "Estrella Diaz Fernandez", 16, direccionEstudiante5);
+  // Agregar estudiantes al sistema
+  sistemaPrueba.agregarEstudiante(estudiante1);
+  sistemaPrueba.agregarEstudiante(estudiante2);
+  sistemaPrueba.agregarEstudiante(estudiante3);
+  sistemaPrueba.agregarEstudiante(estudiante4);
+  sistemaPrueba.agregarEstudiante(estudiante5);
 
-console.log("\n\nAñadimos estudiantes al sistema\n\n");
+  // Crear asignaturas
+  const cliente = new Asignatura("Cliente");
+  const servidor = new Asignatura("Servidor");
+  const diseño = new Asignatura("Diseño");
+  const despliegue = new Asignatura("Despliegue");
+  const empresa = new Asignatura("Empresa");
+  const ingles = new Asignatura("Ingles");
 
-sistema.agregarEstudiante(estudiante1);
-sistema.agregarEstudiante(estudiante2);
-sistema.agregarEstudiante(estudiante3);
-sistema.agregarEstudiante(estudiante4);
-sistema.agregarEstudiante(estudiante5);
+  // Matricular estudiantes y agregar calificaciones
+  estudiante1.matricular("Cliente", "16/09/2023");
+  estudiante1.matricular("Servidor", "16/09/2023");
+  estudiante1.matricular("Diseño", "16/09/2023");
+  estudiante1.agregarCalificacion("Cliente", 10);
+  estudiante1.agregarCalificacion("Cliente", 7);
+  estudiante1.agregarCalificacion("Servidor", 5);
+  estudiante1.agregarCalificacion("Diseño", 8);
+  estudiante1.agregarCalificacion("Diseño", 6);
 
-const Cliente = new Asignatura("Cliente");
-const Servidor = new Asignatura("Servidor");
-const Diseño = new Asignatura("Diseño");
-const Despliegue = new Asignatura("Despliegue");
-const Empresa = new Asignatura("Empresa");
-const Ingles = new Asignatura("Ingles");
+  estudiante2.matricular("Despliegue", "08/11/2022");
+  estudiante2.matricular("Empresa", "08/11/2022");
+  estudiante2.matricular("Ingles", "08/11/2022");
+  estudiante2.agregarCalificacion("Despliegue", 5);
+  estudiante2.agregarCalificacion("Despliegue", 6);
+  estudiante2.agregarCalificacion("Empresa", 8);
+  estudiante2.agregarCalificacion("Empresa", 5.5);
+  estudiante2.agregarCalificacion("Ingles", 7.5);
+  estudiante2.agregarCalificacion("Ingles", 9);
 
-console.log("\n\nMatriculacion de algunos estudiantes en el sistema\n\n");
+  console.log("==============================");
+}
 
-estudiante1.matricular("Cliente", "16/09/2023");
-estudiante1.matricular("Servidor", "16/09/2023");
-estudiante1.matricular("Diseño", "16/09/2023");
-estudiante1.agregarCalificacion("Cliente", 10);
-estudiante1.agregarCalificacion("Cliente", 7);
-estudiante1.agregarCalificacion("Servidor", 5);
-estudiante1.agregarCalificacion("Diseño", 8);
-estudiante1.agregarCalificacion("Diseño", 6);
-
-estudiante2.matricular("Despliegue", "08/11/2022");
-estudiante2.matricular("Empresa", "08/11/2022");
-estudiante2.matricular("Ingles", "08/11/2022");
-estudiante2.agregarCalificacion("Despliegue", 5);
-estudiante2.agregarCalificacion("Despliegue", 6);
-estudiante2.agregarCalificacion("Empresa", 8);
-estudiante2.agregarCalificacion("Empresa", 5.5);
-estudiante2.agregarCalificacion("Ingles", 7.5);
-estudiante2.agregarCalificacion("Ingles", 9);
-
-console.log("\n\nListamos todos los estudiantes\n\n");
-
-console.log(sistema.listarEstudiantes());
-
-console.log("\n\nHacemos un reporte gerenal de los estudiantes (aquí incluye asignaturas y medias)\n\n");
-
-console.log(sistema.generarReporte());
 
 console.log("\n\nMenú funcional con opciones para el manejo del sistema.\n\n");
 
 function menu() {
   const sistema = new SistemaGestionAcademica();
+  cargarDatosDePrueba(sistema);
 
   while (true) {
     console.log("\n===== Sistema de Gestión Académica =====");
