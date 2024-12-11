@@ -102,8 +102,8 @@ class Estudiante extends Persona {
 
   matricular(asignatura, fecha) {
 
-    const fechaRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
-    const match = fecha.match(fechaRegex);
+    const filtroFecha = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+    const match = fecha.match(filtroFecha);
   
     if (!match) {
       console.log("Fecha no válida. Debe estar en el formato DD/MM/YYYY.");
@@ -118,13 +118,20 @@ class Estudiante extends Persona {
       console.log("Fecha no válida. Verifica día, mes y/o año.");
       return;
     }
+    
+    const filtroNombreAsignatura = /^[a-zA-ZIVXLCDM\s]+$/;
 
-    if (!this.asignaturas[asignatura]) {
-      this.asignaturas[asignatura] = [];
-      this.matriculas[asignatura] = fecha;
-      console.log(`${this.nombre} matriculado en ${asignatura} el ${fecha}`);
+    if (filtroNombreAsignatura.test(asignatura)) {
+      if (!this.asignaturas[asignatura]) {
+        this.asignaturas[asignatura] = [];
+        this.matriculas[asignatura] = fecha;
+        console.log(`${this.nombre} matriculado en ${asignatura} el ${fecha}`);
+      } else {
+        console.log(`${this.nombre} ya está matriculado en ${asignatura}`);
+      }
     } else {
-      console.log(`${this.nombre} ya está matriculado en ${asignatura}`);
+      console.log("El nombre de la asignatura solo puede contener letras, números romanos (I, V, X, L, C, D, M) y espacios.");
+      this.nombre = "Asignatura inválida";
     }
   }
 
@@ -187,7 +194,14 @@ class Asignatura {
   nombre;
 
   constructor(nombre) {
-    this.nombre = nombre;
+    const filtro = /^[a-zA-ZIVXLCDM\s]+$/;
+
+    if (filtro.test(nombre)) {
+      this.nombre = nombre;
+    } else {
+      console.log("El nombre de la asignatura solo puede contener letras, números romanos (I, V, X, L, C, D, M) y espacios.");
+      this.nombre = "Asignatura inválida";
+    }
     this.calificaciones = [];
   }
 
