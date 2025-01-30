@@ -87,57 +87,62 @@ mostrarEstudiante: con este método mostramos los datos del estudiante y a parte
 */
 
 class Estudiante extends Persona {
-  asignaturas = {};
+  #asignaturas = {};
   matriculas = {};
 
   constructor(id, nombre, edad, direccion) {
-    super(id, nombre, edad, direccion);
-    this.asignaturas = {};
-    this.matriculas = {};
+    try {
+      super(direccion.calle, direccion.numero, direccion.piso, direccion.codPostal, direccion.provincia, direccion.localidad);
+      if (!/^[a-zA-ZáéíóúüÁÉÍÓÚÜ ]+$/.test(nombre)) {
+        throw new Error("El nombre contiene caracteres inválidos.");
+      }
+      this.id = id;
+      this.nombre = nombre;
+      this.edad = edad;
+    } catch (error) {
+      console.error("Error al crear el estudiante:", error.message);
+    }
   }
 
   get getAsignaturas() {
-    return this.asignaturas;
+    return this.#asignaturas;
   }
 
   matricular(asignatura, fecha) {
-
-    const filtroFecha = /^(\d{2})\/(\d{2})\/(\d{4})$/;
-    const match = fecha.match(filtroFecha);
+    try {
+      const filtroFecha = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+      const match = fecha.match(filtroFecha);
   
-    if (!match) {
-      console.log("Fecha no válida. Debe estar en el formato DD/MM/YYYY.");
-      return;
-    }
+      if (!match) throw new Error("Formato de fecha no válido. Debe ser DD/MM/YYYY.");
   
-    const dia = parseInt(match[1], 10);
-    const mes = parseInt(match[2], 10);
-    const anio = parseInt(match[3], 10);
+      const dia = parseInt(match[1], 10);
+      const mes = parseInt(match[2], 10);
+      const anio = parseInt(match[3], 10);
   
-    if (dia < 1 || dia > 30 || mes < 1 || mes > 12 || anio < 1 || anio > 2024) {
-      console.log("Fecha no válida. Verifica día, mes y/o año.");
-      return;
-    }
-    
-    const filtroNombreAsignatura = /^[a-zA-ZIVXLCDM\s]+$/;
-
-    if (filtroNombreAsignatura.test(asignatura)) {
-      if (!this.asignaturas[asignatura]) {
-        this.asignaturas[asignatura] = [];
+      if (dia < 1 || dia > 30 || mes < 1 || mes > 12 || anio < 1 || anio > 2024) {
+        throw new Error("Fecha fuera de rango válido.");
+      }
+  
+      const filtroNombreAsignatura = /^[a-zA-Z\s]+$/;
+      if (!filtroNombreAsignatura.test(asignatura)) {
+        throw new Error("El nombre de la asignatura solo puede contener letras y espacios.");
+      }
+  
+      if (!this.#asignaturas[asignatura]) {
+        this.#asignaturas[asignatura] = [];
         this.matriculas[asignatura] = fecha;
         console.log(`${this.nombre} matriculado en ${asignatura} el ${fecha}`);
       } else {
         console.log(`${this.nombre} ya está matriculado en ${asignatura}`);
       }
-    } else {
-      console.log("El nombre de la asignatura solo puede contener letras, números romanos (I, V, X, L, C, D, M) y espacios.");
-      this.nombre = "Asignatura inválida";
+    } catch (error) {
+      console.error("Error en la matriculación:", error.message);
     }
   }
 
   desmatricular(asignatura) {
-    if (this.asignaturas[asignatura]) {
-      delete this.asignaturas[asignatura];
+    if (this.#asignaturas[asignatura]) {
+      delete this.#asignaturas[asignatura];
       delete this.matriculas[asignatura];
       console.log(`${this.nombre} desmatriculado de ${asignatura}`);
     } else {
@@ -146,9 +151,9 @@ class Estudiante extends Persona {
   }
 
   agregarCalificacion(asignatura, calificacion) {
-    if (this.asignaturas[asignatura]) {
+    if (this.#asignaturas[asignatura]) {
       if (calificacion >= 0 && calificacion <= 10) {
-        this.asignaturas[asignatura].push(calificacion);
+        this.#asignaturas[asignatura].push(calificacion);
         console.log(`Calificación ${calificacion} añadida en ${asignatura}`);
       } else {
         console.log("La calificación debe estar entre 0 y 10.");
@@ -159,8 +164,8 @@ class Estudiante extends Persona {
   }
 
   calcularPromedioAsignatura(asignatura) {
-    if (this.asignaturas[asignatura] && this.asignaturas[asignatura].length > 0) {
-      const calificaciones = this.asignaturas[asignatura];
+    if (this.#asignaturas[asignatura] && this.#asignaturas[asignatura].length > 0) {
+      const calificaciones = this.#asignaturas[asignatura];
       const suma = calificaciones.reduce((total, nota) => total + nota, 0);
       return (suma / calificaciones.length).toFixed(2);
     }
@@ -168,7 +173,7 @@ class Estudiante extends Persona {
   }
 
   calcularPromedioGeneral() {
-    const todasLasCalificaciones = Object.values(this.asignaturas).flat();
+    const todasLasCalificaciones = Object.values(this.#asignaturas).flat();
     if (todasLasCalificaciones.length === 0) {
       return "No hay calificaciones.";
     }
@@ -177,7 +182,7 @@ class Estudiante extends Persona {
   }
 
   mostrarEstudiante() {
-    return `${super.mostrarPersona()}\nAsignaturas: ${Object.keys(this.asignaturas).join(', ')}`;
+    return `${super.mostrarPersona()}\nAsignaturas: ${Object.keys(this.#asignaturas).join(', ')}`;
   }
 }
 
@@ -355,9 +360,9 @@ function menu() {
     console.log("6. Desmatricular estudiante");
     console.log("7. Añadir calificación");
     console.log("8. Buscar asignaturas por nombre");
-    console.log("9. Calcular promedio de asignatura de un estudiante");
+    console.log("9. Calcular promedio de una asignatura de un estudiante");
     console.log("10. Calcular promedio general de una asignatura");
-    console.log("11. Calcular promedio general");
+    console.log("11. Calcular promedio general de un estudiante");
     console.log("12. Generar reporte general");
     console.log("0. Salir");
     let opcion = window.prompt("Selecciona una opción: ");
